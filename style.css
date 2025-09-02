@@ -1,0 +1,103 @@
+/* style.css */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #111;
+    color: #eee;
+}
+
+/* --- ESTILOS DE CABECERA Y MENÚ --- */
+#main-header { position: fixed; top: 0; left: 0; width: 100%; height: 80px; z-index: 100; display: flex; justify-content: center; align-items: center; background-color: rgba(30, 30, 30, 0.5); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); pointer-events: none; }
+#header-logo { max-height: 70px; width: auto; }
+#menu-toggle { position: fixed; top: 15px; left: 15px; z-index: 1001; background: rgba(0,0,0,0.5); color: white; border: 1px solid #555; font-size: 24px; width: 50px; height: 50px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+#menu-toggle:hover { background: rgba(0,0,0,0.8); }
+
+#side-menu { position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: #1e1e1e; z-index: 1000; box-shadow: 5px 0 15px rgba(0,0,0,0.5); box-sizing: border-box; transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; }
+#side-menu.hidden { transform: translateX(-100%); }
+
+/* --- ESTILOS PARA EL CONTENIDO DEL MENÚ --- */
+#port-search-container, #origin-port-selector, #item-finder { padding: 15px; border-top: 1px solid #444; }
+#port-search-container { padding-top: 80px; border-top: none; } /* Espacio para el botón de menú */
+
+#port-search-input, #origin-port-input, #item-finder-input { width: 100%; padding: 10px; background: #333; border: 1px solid #555; color: #eee; border-radius: 4px; box-sizing: border-box; }
+#origin-port-input.selected { border-color: #2ecc71; background-color: #2c3e50; } /* Feedback visual */
+
+#port-search-results, #origin-port-results { max-height: 150px; overflow-y: auto; margin-top: 5px; }
+#port-search-results div, #origin-port-results div { padding: 10px; cursor: pointer; border-radius: 4px; }
+#port-search-results div:hover, #origin-port-results div:hover { background-color: #333; }
+
+/* ESTILOS BUSCADOR DE ITEMS */
+#item-finder h4, #origin-port-selector h4 { margin: 0 0 10px 0; color: #999; }
+#item-finder-results { max-height: 150px; overflow-y: auto; margin-top: 5px; }
+#item-finder-results .result-item { padding: 8px 10px; cursor: pointer; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+#item-finder-results .result-item:hover { background-color: #333; }
+#item-finder-results .result-info { display: flex; flex-direction: column; }
+#item-finder-results .port-name { font-size: 14px; }
+#item-finder-results .distance { font-size: 11px; color: #999; } /* Estilo para la distancia */
+#item-finder-results .price { font-size: 14px; font-weight: bold; color: #2ecc71; }
+
+#nation-filters { padding: 15px; border-top: 1px solid #444; }
+#nation-filters h4, #battle-calendar h4, #top-targets h4 { margin: 0 0 10px 0; color: #999; }
+#nation-filters .filter-buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+#nation-filters button { background: #444; color: #eee; border: 1px solid #555; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+#nation-filters button.active { background: #3498db; border-color: #2980b9; }
+
+#battle-calendar { padding: 15px; border-top: 1px solid #444; }
+#battle-list { list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; }
+#battle-list li { padding: 10px; border-radius: 4px; cursor: pointer; }
+#battle-list li:hover { background-color: #333; }
+#battle-list li small { display: block; color: #e74c3c; }
+
+#top-targets { padding: 15px; border-top: 1px solid #444; flex: 1; overflow-y: auto; }
+#top-targets-list { padding-left: 20px; margin: 0; }
+#top-targets-list li { padding: 8px 0; cursor: pointer; border-radius: 4px; }
+#top-targets-list li:hover { background-color: #333; }
+#top-targets-list li small { display: block; color: #999; font-size: 12px; }
+
+/* CONTENEDOR DEL MAPA AJUSTADO */
+#map-container { position: absolute; top: 80px; left: 0; right: 0; bottom: 0; }
+
+canvas { display: block; width: 100%; height: 100%; background-color: #000; }
+
+.port-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e1e; color: white; border: 2px solid #444; border-radius: 8px; padding: 10px; z-index: 900; width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+.close-button { position: absolute; top: 5px; right: 8px; background: #444; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; padding: 2px 6px; }
+.close-button:hover { background: #666; }
+.tabs { display: flex; justify-content: space-around; margin-bottom: 10px; }
+.tab-button { background: #333; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; flex: 1; margin: 0 2px; }
+.tab-button.active { background: #555; }
+.tab-content { display: block; }
+.tab-content.hidden { display: none; }
+.hidden { display: none; }
+#tradeItems { list-style-type: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
+#tradeItems li { display: flex; justify-content: space-between; padding: 8px 4px; border-bottom: 1px solid #333; font-size: 14px; }
+#tradeItems li:last-child { border-bottom: none; }
+#tradeItems .item-name { flex-basis: 50%; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#tradeItems .item-details { flex-basis: 50%; text-align: right; color: #bbb; }
+#tradeItems .price-buy { color: #e74c3c; }
+#tradeItems .price-sell { color: #2ecc71; }
+#tooltip { position: fixed; display: none; background-color: rgba(34, 34, 34, 0.9); color: #eee; padding: 8px 12px; border-radius: 6px; font-size: 14px; z-index: 2000; pointer-events: none; border: 1px solid #444; box-shadow: 0 2px 5px rgba(0,0,0,0.5); white-space: nowrap; }
+#tooltip strong { color: #58a6ff; }
+#battleCountdown { font-size: 1.2em; font-weight: bold; color: #e74c3c; font-family: 'Courier New', Courier, monospace; }
+#trade-sorters { display: flex; justify-content: space-between; margin-bottom: 10px; }
+#trade-sorters button { flex: 1; background: #444; color: #eee; border: 1px solid #555; padding: 5px; cursor: pointer; margin: 0 2px; border-radius: 4px; font-size: 12px; }
+#trade-sorters button:hover { background: #555; }
+#trade-summary { margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; font-size: 14px; color: #ccc; }
+#trade-summary p { margin: 5px 0; display: flex; justify-content: space-between; }
+#trade-summary span { font-weight: bold; color: #fff; }
+#port-defenses { list-style-type: none; padding: 5px 0 0 10px; margin: 5px 0; font-size: 14px; }
+#port-defenses li { padding: 2px 0; color: #aeb8c5; }
+hr { border: none; border-top: 1px solid #444; margin: 10px 0; }
+#copyright-footer { position: fixed; bottom: 10px; left: 10px; z-index: 10; font-size: 12px; color: #aaa; opacity: 0.6; pointer-events: none; }
+
+/* NUEVOS ESTILOS PARA PROFUNDIDAD EN TOOLTIP */
+.depth-shallow {
+    color: #3498db; /* Azul para aguas someras */
+}
+.depth-deep {
+    color: #e67e22; /* Naranja para aguas profundas */
+}

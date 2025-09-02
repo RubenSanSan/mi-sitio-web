@@ -1,0 +1,7 @@
+https://storage.googleapis.com/nacleanopenworldprodshards/Shops_cleanopenworldprodeu2.json
+
+https://storage.googleapis.com/nacleanopenworldprodshards/Ports_cleanopenworldprodeu2.json
+
+https://storage.googleapis.com/nacleanopenworldprodshards/ItemTemplates_cleanopenworldprodeu2.json
+
+https://storage.googleapis.com/nacleanopenworldprodshards/ItemTemplates_cleanopenworldprodeu2.json

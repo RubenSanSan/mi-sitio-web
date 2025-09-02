@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mapa Naval Action - Español</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      background-color: #111;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 10px 0;
+      font-size: 24px;
+    }
+
+    #map-container {
+      position: relative;
+      width: 100vw;
+      height: calc(100vh - 50px);
+    }
+
+    canvas#map-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Panel flotante */
+    .port-panel {
+      position: absolute;
+      background: #1e1e1e;
+      color: white;
+      border: 2px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 1000;
+      width: 300px;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 10px;
+    }
+
+    .tab-button {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background: #555;
+    }
+
+    .tab-content {
+      display: block;
+    }
+
+    .tab-content.hidden {
+      display: none;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 5px;
+      right: 8px;
+      background: #444;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    .close-button:hover {
+      background: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mapa Naval Action San San</h1>
+  <div id="map-container">
+    <canvas id="map-canvas"></canvas>
+  </div>
+
+  <!-- Tooltip flotante -->
+  <div id="tooltip" style="display:none; position:absolute; z-index:20; background-color:#222; color:#eee; padding:6px 10px; border-radius:6px; font-size:14px; pointer-events:none;"></div>
+
+  <!-- Panel flotante para mostrar información del puerto -->
+  <div id="portPanel" class="port-panel hidden">
+    <button class="close-button" onclick="document.getElementById('portPanel').classList.add('hidden')">×</button>
+
+    <!-- Pestañas -->
+    <div class="tabs">
+      <button onclick="showTab('battle')" class="tab-button active">Batalla</button>
+      <button onclick="showTab('trade')" class="tab-button">Comercio</button>
+    </div>
+
+    <!-- Contenido de la pestaña Batalla -->
+    <div id="battle" class="tab-content">
+      <h3>Información de Batalla</h3>
+      <p><strong>Estado:</strong> <span id="battleStatus"></span></p>
+      <p><strong>Clan:</strong> <span id="battleClan"></span></p>
+      <p><strong>Próxima batalla:</strong> <span id="battleDate"></span></p>
+      <p><strong>Tipo:</strong> <span id="battleType"></span></p>
+    </div>
+
+    <!-- Contenido de la pestaña Comercio -->
+    <div id="trade" class="tab-content hidden">
+      <h3>Información Comercial</h3>
+      <ul id="tradeItems"></ul>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="map.js"></script>
+  <script src="ports.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
