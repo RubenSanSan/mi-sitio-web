@@ -6,54 +6,85 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- CABECERA -->
+    <!-- CABECERA CON BARRA DE HERRAMIENTAS -->
     <header id="main-header">
+        <div class="toolbar-left">
+            <button id="battle-menu-toggle" title="Inteligencia de Batalla">
+                <img src="imagenes/batalla.png" alt="Batalla">
+            </button>
+            <button id="trade-menu-toggle" title="Inteligencia Comercial">
+                <img src="imagenes/comercio.png" alt="Comercio">
+            </button>
+            <!-- NUEVO BOTÓN DE CRAFTEO -->
+            <button id="crafting-menu-toggle" title="Inteligencia de Crafteo">
+                <img src="imagenes/crafteo.png" alt="Crafteo">
+            </button>
+            <div id="port-search-container">
+                <input type="text" id="port-search-input" placeholder="Buscar puerto...">
+                <div id="port-search-results"></div>
+            </div>
+        </div>
+
         <img src="imagenes/cabeza.png" alt="Logo del Mapa" id="header-logo">
+
+        <div class="toolbar-right">
+            <button id="stats-toggle" title="Estadísticas del Servidor">
+                <img src="imagenes/estadisticas.png" alt="Estadísticas">
+            </button>
+        </div>
     </header>
 
-    <button id="menu-toggle">☰</button>
-
-    <!-- MENÚ LATERAL ACTUALIZADO -->
-    <nav id="side-menu" class="hidden">
-        <!-- Buscador de Puertos -->
-        <div id="port-search-container">
-            <input type="text" id="port-search-input" placeholder="Buscar puerto...">
-            <div id="port-search-results"></div>
-        </div>
-        
-        <!-- NUEVA SECCIÓN: SELECTOR DE PUERTO DE ORIGEN -->
-        <div id="origin-port-selector">
-            <h4>Puerto de Origen</h4>
-            <input type="text" id="origin-port-input" placeholder="Escribe tu puerto actual...">
-            <div id="origin-port-results"></div>
-        </div>
-
-        <!-- Buscador de Items -->
-        <div id="item-finder">
-            <h4>Buscador de Items</h4>
-            <input type="text" id="item-finder-input" placeholder="Buscar item...">
-            <div id="item-finder-results"></div>
-        </div>
-
-        <!-- Filtros por Nación -->
-        <div id="nation-filters">
-            <h4>Filtros por Nación</h4>
-            <div class="filter-buttons"></div>
-        </div>
-
-        <!-- Calendario de Batallas -->
-        <div id="battle-calendar">
-            <h4>Batallas Próximas</h4>
-            <ul id="battle-list"></ul>
-        </div>
-
-        <!-- Objetivos Prioritarios -->
-        <div id="top-targets">
-            <h4>Objetivos Prioritarios</h4>
-            <ol id="top-targets-list"></ol>
+    <!-- PANELES DE MENÚ -->
+    <nav id="battle-menu" class="side-panel hidden">
+        <div id="battle-intelligence">
+            <h4>Inteligencia de Batalla</h4>
+            <div id="raid-alerts"></div>
+            <div id="cooldown-table-container">
+                <table id="cooldown-table">
+                    <thead><tr><th>Clan</th><th>Puerto</th><th>Próximo Ataque</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </nav>
-    <!-- FIN DE MENÚ -->
+    <nav id="trade-menu" class="side-panel hidden">
+        <div id="route-finder">
+            <h4>Calculadora de Rutas</h4>
+            <input type="text" id="route-finder-input" placeholder="Buscar un producto...">
+            <div id="route-finder-results"></div>
+        </div>
+    </nav>
+    
+    <!-- NUEVO PANEL DE CRAFTEO -->
+    <nav id="crafting-menu" class="side-panel hidden">
+        <div id="recipe-finder">
+            <h4>Buscador de Recetas</h4>
+            <input type="text" id="recipe-finder-input" placeholder="Buscar receta...">
+            <div id="recipe-finder-results"></div>
+        </div>
+        <div id="special-ports">
+            <h4>Puertos de Calidad Extra</h4>
+            <ul id="special-ports-list"></ul>
+        </div>
+    </nav>
+
+    <nav id="stats-menu" class="hidden">
+        <h3>Estadísticas del Servidor</h3>
+        <div id="stats-content-wrapper">
+            <div class="stats-section">
+                <h4>Dominio de Naciones</h4>
+                <ul id="nation-dominance-list"></ul>
+            </div>
+            <div class="stats-section">
+                <h4>Centros de Comercio</h4>
+                <ol id="trade-hubs-list"></ol>
+            </div>
+            <div class="stats-section">
+                <h4>Clanes Dominantes</h4>
+                <ol id="clan-power-list"></ol>
+            </div>
+        </div>
+    </nav>
 
     <div id="map-container">
         <canvas id="map-canvas"></canvas>

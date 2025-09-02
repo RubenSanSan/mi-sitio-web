@@ -1,134 +1,119 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mapa Naval Action - Español</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      margin: 0;
-      background-color: #111;
-      color: #eee;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-    }
-
-    h1 {
-      text-align: center;
-      margin: 10px 0;
-      font-size: 24px;
-    }
-
-    #map-container {
-      position: relative;
-      width: 100vw;
-      height: calc(100vh - 50px);
-    }
-
-    canvas#map-canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Panel flotante */
-    .port-panel {
-      position: absolute;
-      background: #1e1e1e;
-      color: white;
-      border: 2px solid #444;
-      border-radius: 8px;
-      padding: 10px;
-      z-index: 1000;
-      width: 300px;
-    }
-
-    .tabs {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 10px;
-    }
-
-    .tab-button {
-      background: #333;
-      color: white;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-    }
-
-    .tab-button.active {
-      background: #555;
-    }
-
-    .tab-content {
-      display: block;
-    }
-
-    .tab-content.hidden {
-      display: none;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .close-button {
-      position: absolute;
-      top: 5px;
-      right: 8px;
-      background: #444;
-      color: white;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 4px;
-      padding: 2px 6px;
-    }
-
-    .close-button:hover {
-      background: #666;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Mapa Naval Action - Español</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Mapa Naval Action San San</h1>
-  <div id="map-container">
-    <canvas id="map-canvas"></canvas>
-  </div>
+    <!-- CABECERA ACTUALIZADA CON BARRA DE HERRAMIENTAS INTEGRADA -->
+    <header id="main-header">
+        <div class="toolbar-left">
+            <button id="battle-menu-toggle" title="Inteligencia de Batalla">
+                <img src="imagenes/batalla.png" alt="Batalla">
+            </button>
+            <button id="trade-menu-toggle" title="Inteligencia Comercial">
+                <img src="imagenes/comercio.png" alt="Comercio">
+            </button>
+            <div id="port-search-container">
+                <input type="text" id="port-search-input" placeholder="Buscar puerto...">
+                <div id="port-search-results"></div>
+            </div>
+        </div>
 
-  <!-- Tooltip flotante -->
-  <div id="tooltip" style="display:none; position:absolute; z-index:20; background-color:#222; color:#eee; padding:6px 10px; border-radius:6px; font-size:14px; pointer-events:none;"></div>
+        <img src="imagenes/cabeza.png" alt="Logo del Mapa" id="header-logo">
 
-  <!-- Panel flotante para mostrar información del puerto -->
-  <div id="portPanel" class="port-panel hidden">
-    <button class="close-button" onclick="document.getElementById('portPanel').classList.add('hidden')">×</button>
+        <div class="toolbar-right">
+            <button id="stats-toggle" title="Estadísticas del Servidor">
+                <img src="imagenes/estadisticas.png" alt="Estadísticas">
+            </button>
+        </div>
+    </header>
 
-    <!-- Pestañas -->
-    <div class="tabs">
-      <button onclick="showTab('battle')" class="tab-button active">Batalla</button>
-      <button onclick="showTab('trade')" class="tab-button">Comercio</button>
+    <!-- PANELES DE MENÚ IZQUIERDOS -->
+    <nav id="battle-menu" class="side-panel hidden">
+        <div id="battle-intelligence">
+            <h4>Inteligencia de Batalla</h4>
+            <div id="raid-alerts"></div>
+            <div id="cooldown-table-container">
+                <table id="cooldown-table">
+                    <thead><tr><th>Clan</th><th>Puerto</th><th>Próximo Ataque</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </nav>
+    <nav id="trade-menu" class="side-panel hidden">
+        <div id="route-finder">
+            <h4>Calculadora de Rutas</h4>
+            <input type="text" id="route-finder-input" placeholder="Buscar un producto...">
+            <div id="route-finder-results"></div>
+        </div>
+    </nav>
+
+    <!-- MENÚ DERECHO DE ESTADÍSTICAS -->
+    <nav id="stats-menu" class="hidden">
+        <h3>Estadísticas del Servidor</h3>
+        <div id="stats-content-wrapper">
+            <div class="stats-section">
+                <h4>Dominio de Naciones</h4>
+                <ul id="nation-dominance-list"></ul>
+            </div>
+            <div class="stats-section">
+                <h4>Centros de Comercio</h4>
+                <ol id="trade-hubs-list"></ol>
+            </div>
+            <div class="stats-section">
+                <h4>Clanes Dominantes</h4>
+                <ol id="clan-power-list"></ol>
+            </div>
+        </div>
+    </nav>
+
+    <div id="map-container">
+        <canvas id="map-canvas"></canvas>
     </div>
 
-    <!-- Contenido de la pestaña Batalla -->
-    <div id="battle" class="tab-content">
-      <h3>Información de Batalla</h3>
-      <p><strong>Estado:</strong> <span id="battleStatus"></span></p>
-      <p><strong>Clan:</strong> <span id="battleClan"></span></p>
-      <p><strong>Próxima batalla:</strong> <span id="battleDate"></span></p>
-      <p><strong>Tipo:</strong> <span id="battleType"></span></p>
+    <div id="tooltip"></div>
+
+    <div id="portPanel" class="port-panel hidden">
+        <h3 id="port-panel-title">Nombre del Puerto</h3>
+        <button id="close-panel-button" class="close-button">×</button>
+        <div class="tabs">
+            <button data-tab="battle" class="tab-button active">Batalla</button>
+            <button data-tab="trade" class="tab-button">Comercio</button>
+        </div>
+        <div id="battle" class="tab-content">
+            <p><strong>Clan:</strong> <span id="battleClan"></span></p>
+            <p><strong>Próxima batalla:</strong> <span id="battleCountdown"></span></p>
+            <p><strong>Última batalla:</strong> <span id="lastBattleDate"></span></p>
+            <hr>
+            <p><strong>Límite de BR:</strong> <span id="battle-br-limit"></span></p>
+            <p><strong>Puntos de Puerto:</strong> <span id="port-points"></span></p>
+            <p><strong>Ventana de Batalla:</strong> <span id="battle-window"></span></p>
+            <strong>Defensas:</strong>
+            <ul id="port-defenses"></ul>
+        </div>
+        <div id="trade" class="tab-content hidden">
+            <div id="trade-sorters">
+                <button data-sort="name">Nombre</button>
+                <button data-sort="quantity">Cantidad</button>
+                <button data-sort="buy">Compra</button>
+                <button data-sort="sell">Venta</button>
+            </div>
+            <ul id="tradeItems"></ul>
+            <div id="trade-summary">
+                <p>Impuesto: <span id="trade-tax"></span></p>
+                <p>Volumen Total: <span id="trade-volume"></span></p>
+            </div>
+        </div>
     </div>
 
-    <!-- Contenido de la pestaña Comercio -->
-    <div id="trade" class="tab-content hidden">
-      <h3>Información Comercial</h3>
-      <ul id="tradeItems"></ul>
+    <div id="copyright-footer">
+        &copy; Copyright hecho por Ruben San San
     </div>
-  </div>
 
-  <!-- Scripts -->
-  <script src="map.js"></script>
-  <script src="ports.js"></script>
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
+
