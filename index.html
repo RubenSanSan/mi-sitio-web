@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- CABECERA CON BARRA DE HERRAMIENTAS -->
+    <!-- CABECERA ACTUALIZADA CON BARRA DE HERRAMIENTAS INTEGRADA -->
     <header id="main-header">
         <div class="toolbar-left">
             <button id="battle-menu-toggle" title="Inteligencia de Batalla">
@@ -14,10 +14,6 @@
             </button>
             <button id="trade-menu-toggle" title="Inteligencia Comercial">
                 <img src="imagenes/comercio.png" alt="Comercio">
-            </button>
-            <!-- NUEVO BOTÓN DE CRAFTEO -->
-            <button id="crafting-menu-toggle" title="Inteligencia de Crafteo">
-                <img src="imagenes/crafteo.png" alt="Crafteo">
             </button>
             <div id="port-search-container">
                 <input type="text" id="port-search-input" placeholder="Buscar puerto...">
@@ -34,7 +30,7 @@
         </div>
     </header>
 
-    <!-- PANELES DE MENÚ -->
+    <!-- PANELES DE MENÚ IZQUIERDOS -->
     <nav id="battle-menu" class="side-panel hidden">
         <div id="battle-intelligence">
             <h4>Inteligencia de Batalla</h4>
@@ -54,20 +50,8 @@
             <div id="route-finder-results"></div>
         </div>
     </nav>
-    
-    <!-- NUEVO PANEL DE CRAFTEO -->
-    <nav id="crafting-menu" class="side-panel hidden">
-        <div id="recipe-finder">
-            <h4>Buscador de Recetas</h4>
-            <input type="text" id="recipe-finder-input" placeholder="Buscar receta...">
-            <div id="recipe-finder-results"></div>
-        </div>
-        <div id="special-ports">
-            <h4>Puertos de Calidad Extra</h4>
-            <ul id="special-ports-list"></ul>
-        </div>
-    </nav>
 
+    <!-- MENÚ DERECHO DE ESTADÍSTICAS -->
     <nav id="stats-menu" class="hidden">
         <h3>Estadísticas del Servidor</h3>
         <div id="stats-content-wrapper">
@@ -132,3 +116,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
