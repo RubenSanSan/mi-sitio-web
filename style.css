@@ -15,22 +15,29 @@ html, body {
 #main-header { position: fixed; top: 0; left: 0; width: 100%; height: 80px; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; background-color: rgba(30, 30, 30, 0.5); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 #header-logo { max-height: 70px; width: auto; pointer-events: none; position: absolute; left: 50%; transform: translateX(-50%); }
 .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 10px; z-index: 101; }
-#battle-menu-toggle, #trade-menu-toggle, #stats-toggle, #crafting-menu-toggle { background: rgba(0,0,0,0.5); border: 1px solid #555; width: 45px; height: 45px; border-radius: 8px; cursor: pointer; transition: all 0.2s; padding: 8px; box-sizing: border-box; box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
-#battle-menu-toggle.active, #trade-menu-toggle.active, #stats-toggle.active, #crafting-menu-toggle.active { background: #3498db; border-color: #2980b9; box-shadow: 0 0 15px #3498db; }
-#battle-menu-toggle:hover, #trade-menu-toggle:hover, #stats-toggle:hover, #crafting-menu-toggle:hover { background: rgba(0,0,0,0.8); box-shadow: 0 0 12px rgba(255, 255, 255, 0.6); }
+#battle-menu-toggle, #trade-menu-toggle, #stats-toggle, #crafting-menu-toggle, #wind-predictor-toggle { background: rgba(0,0,0,0.5); border: 1px solid #555; width: 45px; height: 45px; border-radius: 8px; cursor: pointer; transition: all 0.2s; padding: 8px; box-sizing: border-box; box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
+#battle-menu-toggle.active, #trade-menu-toggle.active, #stats-toggle.active, #crafting-menu-toggle.active, #wind-predictor-toggle.active { background: #3498db; border-color: #2980b9; box-shadow: 0 0 15px #3498db; }
+#battle-menu-toggle:hover, #trade-menu-toggle:hover, #stats-toggle:hover, #crafting-menu-toggle:hover, #wind-predictor-toggle:hover { background: rgba(0,0,0,0.8); box-shadow: 0 0 12px rgba(255, 255, 255, 0.6); }
 
-/* CORRECCIÓN FINAL: Ajusta el filtro para mantener el detalle del icono, oscureciéndolo un poco si es blanco y luego dándole brillo */
-#battle-menu-toggle img, #trade-menu-toggle img, #stats-toggle img, #crafting-menu-toggle img {
+#battle-menu-toggle.raid-active {
+    border-color: #ff4d4d;
+    animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.7), 0 0 3px rgba(255, 0, 0, 0.8) inset; }
+    50% { box-shadow: 0 0 18px rgba(255, 80, 80, 1), 0 0 6px rgba(255, 80, 80, 1) inset; }
+    100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.7), 0 0 3px rgba(255, 0, 0, 0.8) inset; }
+}
+
+#battle-menu-toggle img, #trade-menu-toggle img, #stats-toggle img, #crafting-menu-toggle img, #wind-predictor-toggle img {
     width: 100%;
     height: 100%;
-    /* filter: brightness(0.5) invert(0); */ /* Opcional: si los iconos son blancos y quieres oscurecerlos */
-    filter: brightness(0.8); /* Esto hará que los iconos se vean más oscuros, pero mantendrá el detalle */
+    filter: brightness(0.8);
 }
-/* Al estar activo, el icono se vuelve blanco puro para resaltar */
-#battle-menu-toggle.active img, #trade-menu-toggle.active img, #stats-toggle.active img, #crafting-menu-toggle.active img {
-    filter: brightness(0) invert(1); /* Convierte el icono a blanco puro */
+#battle-menu-toggle.active img, #trade-menu-toggle.active img, #stats-toggle.active img, #crafting-menu-toggle.active img, #wind-predictor-toggle.active img {
+    filter: brightness(0) invert(1);
 }
-
 
 #port-search-container { width: 200px; position: relative; }
 #port-search-input { width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #eee; border-radius: 4px; box-sizing: border-box; }
@@ -38,9 +45,9 @@ html, body {
 #port-search-results div { padding: 10px; cursor: pointer; border-radius: 4px; }
 #port-search-results div:hover { background-color: #333; }
 
-.side-panel, #stats-menu { position: fixed; top: 80px; width: 300px; height: calc(100% - 80px); background: #1e1e1e; z-index: 1000; box-shadow: 5px 0 15px rgba(0,0,0,0.5); box-sizing: border-box; transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; }
+.side-panel { position: fixed; top: 80px; width: 300px; height: calc(100% - 80px); background: #1e1e1e; z-index: 1000; box-shadow: 5px 0 15px rgba(0,0,0,0.5); box-sizing: border-box; transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; }
 #battle-menu, #trade-menu, #crafting-menu { left: 0; }
-#stats-menu { right: 0; }
+#stats-menu { right: 0; } 
 #battle-menu.hidden, #trade-menu.hidden, #crafting-menu.hidden { transform: translateX(-100%); }
 #stats-menu.hidden { transform: translateX(100%); }
 
@@ -48,9 +55,186 @@ html, body {
 .side-panel > div { flex: 1; overflow-y: auto; }
 
 #stats-menu h3 { padding-top: 15px; text-align: center; margin: 0; }
-#battle-intelligence h4, #route-finder h4, #recipe-finder h4, #special-ports h4, .stats-section h4, #top-profit-container h4 { margin: 0 0 10px 0; color: #999; border-bottom: 1px solid #444; padding-bottom: 10px;}
+#battle-intelligence h4, #route-finder h4, #recipe-finder h4, #special-ports h4, .stats-section h4, #top-profit-container h4, #product-finder h4 { margin: 0 0 10px 0; color: #999; border-bottom: 1px solid #444; padding-bottom: 10px;}
 
-#route-finder-input, #recipe-finder-input { width: 100%; padding: 10px; background: #333; border: 1px solid #555; color: #eee; border-radius: 4px; box-sizing: border-box; margin-bottom: 10px;}
+.battle-section { padding-top: 10px; border-top: 1px solid #444; }
+.battle-section h5 { margin: 0 0 10px; color: #bbb; font-size: 16px; }
+.battle-section ul { list-style: none; padding: 0; margin: 0; }
+.battle-section li { padding: 8px 4px; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; justify-content: space-between; }
+.battle-section li:hover { background-color: #333; }
+.battle-section .port-name { font-weight: bold; }
+.battle-section .port-info { font-size: 12px; color: #999; }
+.battle-section .port-date { font-weight: bold; color: #e67e22; }
+.battle-section .port-date.defense { color: #2ecc71; }
+.battle-section .empty-list { color: #777; font-style: italic; padding: 10px 4px; }
+
+/* --- ESTILOS DE VENTANAS MODALES Y OVERLAY --- */
+#modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1900;
+}
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1e1e1e;
+    color: white;
+    border: 2px solid #444;
+    border-radius: 8px;
+    padding: 20px;
+    z-index: 2000;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+}
+
+#wind-predictor-modal {
+    width: 650px;
+    padding: 25px 30px;
+}
+#wind-predictor-modal h4 {
+    text-align: center;
+    font-size: 1.8em;
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: #ccc;
+    border-bottom: 1px solid #444;
+    padding-bottom: 20px;
+}
+.wind-predictor-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.wind-controls {
+    flex-basis: 50%;
+}
+#wind-prediction-result {
+    flex-basis: 45%;
+    text-align: center;
+}
+#wind-predictor-modal .input-group {
+    margin-bottom: 20px;
+}
+#wind-predictor-modal label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ddd;
+    font-size: 1em;
+}
+#wind-predictor-modal input[type="time"],
+#wind-predictor-modal select {
+    width: 100%;
+    padding: 10px;
+    background: #2c2c2c;
+    border: 1px solid #555;
+    color: #eee;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1.1em;
+}
+#calculate-wind-button {
+    width: 100%;
+    padding: 14px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2em;
+    margin-top: 15px;
+    transition: background-color 0.2s ease;
+}
+#calculate-wind-button:hover {
+    background-color: #2980b9;
+}
+#predicted-wind-text {
+    font-weight: bold;
+    color: #e67e22;
+    font-size: 1.5em;
+}
+#predicted-wind-degrees {
+    font-size: 1.1em;
+    color: #999;
+}
+#predicted-inverse-text {
+    font-weight: bold;
+    color: #3498db;
+    font-size: 1.2em;
+}
+#predicted-inverse-degrees {
+    font-size: 0.9em;
+    color: #999;
+}
+.wind-label {
+    font-size: 0.9em;
+    color: #999;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+.wind-label-inverse {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 15px;
+    text-transform: uppercase;
+}
+.compass-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 180px;
+    width: 180px;
+    margin: 0 auto;
+    background-image: url('imagenes/compas.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+}
+#wind-arrow-container {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease-out;
+    transform-origin: center;
+    position: absolute;
+}
+#wind-arrow {
+    width: 0; 
+    height: 0; 
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 35px solid #e74c3c;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+#wind-arrow::before {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 110px;
+    background-color: #e74c3c;
+    left: -3px;
+    top: 35px;
+}
+#wind-arrow::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 25px solid #e74c3c;
+    left: -12px;
+    top: 145px;
+}
+
+#route-finder-input, #recipe-finder-input, #product-finder-input { width: 100%; padding: 10px; background: #333; border: 1px solid #555; color: #eee; border-radius: 4px; box-sizing: border-box; margin-bottom: 10px;}
 #route-finder-results .route { border: 1px solid #333; border-radius: 4px; padding: 10px; margin-bottom: 10px; cursor: pointer; }
 #route-finder-results .route:hover { background-color: #333; }
 #route-finder-results .route-header { display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; margin-bottom: 8px; pointer-events: none; }
@@ -61,7 +245,32 @@ html, body {
 #route-finder-results .price-sell { color: #2ecc71; }
 #route-finder-results .distance { color: #999; }
 
-/* ESTILOS PARA TOP 10 BENEFICIOS */
+#product-finder {
+    border-bottom: 1px solid #444;
+}
+#product-finder-results .product-location {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    border-radius: 4px;
+}
+#product-finder-results .product-location:hover {
+    background-color: #333;
+}
+#product-finder-results .product-location:last-child {
+    border-bottom: none;
+}
+.location-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.location-details {
+    font-size: 0.9em;
+    color: #bbb;
+}
+
 #top-profit-container { border-bottom: 1px solid #444; }
 #top-profit-list { list-style: none; padding: 0; margin: 0; }
 #top-profit-list li { display: flex; justify-content: space-between; padding: 8px 4px; border-radius: 4px; cursor: pointer; font-size: 14px; }
@@ -69,7 +278,6 @@ html, body {
 .top-item-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px; }
 .top-item-profit { color: #2ecc71; font-weight: bold; flex-shrink: 0; }
 
-/* ESTILOS PARA EL PANEL DE CRAFTEO */
 #recipe-finder-results .recipe-result { padding: 10px; cursor: pointer; border-radius: 4px; }
 #recipe-finder-results .recipe-result:hover { background-color: #333; }
 #recipe-finder-results .recipe-details h5 { margin: 10px 0 5px; color: #bbb; border-bottom: 1px solid #444; padding-bottom: 5px; }
@@ -85,12 +293,6 @@ html, body {
 
 #raid-alerts { margin-bottom: 15px; }
 #raid-alerts .alert { background-color: #c0392b; padding: 10px; border-radius: 4px; font-size: 14px; text-align: center; cursor: pointer; }
-#cooldown-table-container { max-height: 200px; overflow-y: auto; }
-#cooldown-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-#cooldown-table th, #cooldown-table td { padding: 8px 5px; text-align: left; border-bottom: 1px solid #333; }
-#cooldown-table th { color: #bbb; }
-#cooldown-table tbody tr { cursor: pointer; }
-#cooldown-table tbody tr:hover { background-color: #333; }
 
 #stats-content-wrapper { flex: 1; overflow-y: auto; }
 .stats-section { border-top: 1px solid #444; }
@@ -122,7 +324,6 @@ canvas { display: block; width: 100%; height: 100%; background-color: #000; }
 #tradeItems .price-buy { color: #e74c3c; }
 #tradeItems .price-sell { color: #2ecc71; }
 
-/* ESTILOS PANEL DE MATERIALES */
 #material-list-container { max-height: 400px; overflow-y: auto; padding-right: 10px; }
 .material-item { margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
 .material-item:last-child { border-bottom: none; }
@@ -130,7 +331,7 @@ canvas { display: block; width: 100%; height: 100%; background-color: #000; }
 .material-item ul { list-style: none; padding-left: 10px; margin: 0; }
 .material-item li { font-size: 14px; padding: 3px 0; }
 
-#tooltip { position: fixed; display: none; background-color: rgba(34, 34, 34, 0.9); color: #eee; padding: 8px 12px; border-radius: 6px; font-size: 14px; z-index: 2000; pointer-events: none; border: 1px solid #444; box-shadow: 0 2px 5px rgba(0,0,0,0.5); white-space: nowrap; }
+#tooltip { position: fixed; display: none; background-color: rgba(34, 34, 34, 0.9); color: #eee; padding: 8px 12px; border-radius: 6px; font-size: 14px; z-index: 2100; pointer-events: none; border: 1px solid #444; box-shadow: 0 2px 5px rgba(0,0,0,0.5); white-space: nowrap; }
 #tooltip strong { color: #58a6ff; }
 #battleCountdown { font-size: 1.2em; font-weight: bold; color: #e74c3c; font-family: 'Courier New', Courier, monospace; }
 #trade-summary { margin-top: 15px; padding-top: 10px; border-top: 1px solid #444; font-size: 14px; color: #ccc; }

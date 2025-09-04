@@ -26,6 +26,9 @@
         <img src="imagenes/cabeza.png" alt="Logo del Mapa" id="header-logo">
 
         <div class="toolbar-right">
+            <button id="wind-predictor-toggle" title="Predictor de Viento">
+                <img src="imagenes/compas.png" alt="Compás">
+            </button>
             <button id="stats-toggle" title="Estadísticas del Servidor">
                 <img src="imagenes/estadisticas.png" alt="Estadísticas">
             </button>
@@ -36,23 +39,31 @@
         <div id="battle-intelligence">
             <h4>Inteligencia de Batalla</h4>
             <div id="raid-alerts"></div>
-            <div id="cooldown-table-container">
-                <table id="cooldown-table">
-                    <thead><tr><th>Clan</th><th>Puerto</th><th>Próximo Ataque</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+            <div id="spanish-defenses" class="battle-section">
+                <h5>Nuestras Defensas</h5>
+                <ul id="spanish-defenses-list"></ul>
+            </div>
+            <div id="attack-targets" class="battle-section">
+                <h5>Próximos Objetivos</h5>
+                <ul id="attack-targets-list"></ul>
             </div>
         </div>
     </nav>
     
     <nav id="trade-menu" class="side-panel hidden">
+        <div id="product-finder">
+            <h4>Buscador de Productos</h4>
+            <input type="text" id="product-finder-input" placeholder="Buscar cualquier producto...">
+            <div id="product-finder-results"></div>
+        </div>
+
         <div id="top-profit-container">
             <h4>Top 10 Beneficios Globales</h4>
             <ol id="top-profit-list"></ol>
         </div>
         <div id="route-finder">
             <h4>Calculadora de Rutas</h4>
-            <input type="text" id="route-finder-input" placeholder="Buscar un producto...">
+            <input type="text" id="route-finder-input" placeholder="Buscar producto para ruta...">
             <div id="route-finder-results"></div>
         </div>
     </nav>
@@ -69,7 +80,7 @@
         </div>
     </nav>
 
-    <nav id="stats-menu" class="hidden">
+    <nav id="stats-menu" class="side-panel hidden">
         <h3>Estadísticas del Servidor</h3>
         <div id="stats-content-wrapper">
             <div class="stats-section">
@@ -130,7 +141,65 @@
         <h3 id="material-panel-title">Materiales para: Receta</h3>
         <button id="close-material-panel-button" class="close-button">×</button>
         <div id="material-list-container">
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="hidden"></div>
+
+    <div id="wind-predictor-modal" class="modal hidden">
+        <button id="close-wind-predictor-button" class="close-button">×</button>
+        <h4>Predictor de Viento</h4>
+        <div class="wind-predictor-content">
+            <div class="wind-controls">
+                <div class="input-group">
+                    <label for="current-server-time">Hora Actual Servidor (UTC):</label>
+                    <input type="time" id="current-server-time" value="12:00">
+                </div>
+                <div class="input-group">
+                    <label for="current-wind-direction">Dirección Actual del Viento:</label>
+                    <select id="current-wind-direction">
+                        <option value="N">Norte (N)</option>
+                        <option value="NNE">Nornoreste (NNE)</option>
+                        <option value="NE">Noreste (NE)</option>
+                        <option value="ENE">Estenoreste (ENE)</option>
+                        <option value="E">Este (E)</option>
+                        <option value="ESE">Estesureste (ESE)</option>
+                        <option value="SE">Sureste (SE)</option>
+                        <option value="SSE">Sursureste (SSE)</option>
+                        <option value="S">Sur (S)</option>
+                        <option value="SSW">Sursuroeste (SSW)</option>
+                        <option value="SW">Suroeste (SW)</option>
+                        <option value="WSW">Oestesuroeste (WSW)</option>
+                        <option value="W">Oeste (W)</option>
+                        <option value="WNW">Oestenoroeste (WNW)</option>
+                        <option value="NW">Noroeste (NW)</option>
+                        <option value="NNW">Nornoroeste (NNW)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="future-prediction-time">Predecir para la Hora (UTC):</label>
+                    <input type="time" id="future-prediction-time" value="13:00">
+                </div>
+                <button id="calculate-wind-button">Calcular Predicción</button>
             </div>
+            <div id="wind-prediction-result">
+                <p class="wind-label">VIENTO DESDE</p>
+                <div class="compass-container">
+                    <div id="wind-arrow-container">
+                        <div id="wind-arrow"></div>
+                    </div>
+                </div>
+                <p>
+                    <span id="predicted-wind-text">--</span>
+                    <span id="predicted-wind-degrees"></span>
+                </p>
+                <p class="wind-label-inverse">RUMBO (VA HACIA)</p>
+                <p>
+                    <span id="predicted-inverse-text">--</span>
+                    <span id="predicted-inverse-degrees"></span>
+                </p>
+            </div>
+        </div>
     </div>
 
     <div id="copyright-footer">
