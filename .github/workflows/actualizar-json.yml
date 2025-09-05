@@ -3,7 +3,7 @@ name: Actualizar JSON Naval Action
 on:
   schedule:
     - cron: '0 11 * * *'  # 13:00 CEST = 11:00 UTC
-  workflow_dispatch:
+  workflow_dispatch:      # Permite ejecución manual desde GitHub
 
 jobs:
   actualizar:
@@ -22,22 +22,23 @@ jobs:
         run: pip install requests
 
       - name: Ejecutar script
-        run: python descargar_json.py
+        run: python actualizar_json.py
 
-      - name: Subir archivos JSON al servidor
-        uses: sebastianpopp/ftp-action@v2
+      - name: Subir archivos JSON al servidor por FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          host: ${{ secrets.FTP_HOST }}
-          user: ${{ secrets.FTP_USER }}
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASS }}
-          localDir: datos_actualizados
-          remoteDir: /public_html/data
+          local-dir: datos_actualizados
+          server-dir: /public_html/data
 
-      - name: Subir ports.js al servidor
-        uses: sebastianpopp/ftp-action@v2
+      - name: Subir ports.js al servidor por FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          host: ${{ secrets.FTP_HOST }}
-          user: ${{ secrets.FTP_USER }}
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASS }}
-          localDir: mi-mapa
-          remoteDir: /public_html/mi-mapa
+          local-dir: mi-mapa
+          server-dir: /public_html/mi-mapa
+
