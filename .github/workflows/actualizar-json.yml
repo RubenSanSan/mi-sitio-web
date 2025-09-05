@@ -1,0 +1,43 @@
+name: Actualizar JSON Naval Action
+
+on:
+  schedule:
+    - cron: '0 11 * * *'  # 13:00 CEST = 11:00 UTC
+  workflow_dispatch:
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install requests
+
+      - name: Ejecutar script
+        run: python descargar_json.py
+
+      - name: Subir archivos JSON al servidor
+        uses: sebastianpopp/ftp-action@v2
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          user: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          localDir: datos_actualizados
+          remoteDir: /public_html/data
+
+      - name: Subir ports.js al servidor
+        uses: sebastianpopp/ftp-action@v2
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          user: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          localDir: mi-mapa
+          remoteDir: /public_html/mi-mapa
