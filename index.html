@@ -155,43 +155,16 @@
                     <label for="current-server-time">Hora Actual Servidor (UTC):</label>
                     <input type="time" id="current-server-time" value="12:00">
                 </div>
+                
                 <div class="input-group">
-                    <label for="current-wind-direction">Dirección Actual del Viento:</label>
-                    <select id="current-wind-direction">
-                        <option value="N">Norte (N)</option>
-                        <option value="NbE">Norte por Este (NbE)</option>
-                        <option value="NNE">Nornoreste (NNE)</option>
-                        <option value="NEbN">Noreste por Norte (NEbN)</option>
-                        <option value="NE">Noreste (NE)</option>
-                        <option value="NEbE">Noreste por Este (NEbE)</option>
-                        <option value="ENE">Estenoreste (ENE)</option>
-                        <option value="EbN">Este por Norte (EbN)</option>
-                        <option value="E">Este (E)</option>
-                        <option value="EbS">Este por Sur (EbS)</option>
-                        <option value="ESE">Estesureste (ESE)</option>
-                        <option value="SEbE">Sureste por Este (SEbE)</option>
-                        <option value="SE">Sureste (SE)</option>
-                        <option value="SEbS">Sureste por Sur (SEbS)</option>
-                        <option value="SSE">Sursureste (SSE)</option>
-                        <option value="SbE">Sur por Este (SbE)</option>
-                        <option value="S">Sur (S)</option>
-                        <option value="SbW">Sur por Oeste (SbW)</option>
-                        <option value="SSW">Sursuroeste (SSW)</option>
-                        <option value="SWbS">Suroeste por Sur (SWbS)</option>
-                        <option value="SW">Suroeste (SW)</option>
-                        <option value="SWbW">Suroeste por Oeste (SWbW)</option>
-                        <option value="WSW">Oestesuroeste (WSW)</option>
-                        <option value="WbS">Oeste por Sur (WbS)</option>
-                        <option value="W">Oeste (W)</option>
-                        <option value="WbN">Oeste por Norte (WbN)</option>
-                        <option value="WNW">Oestenoroeste (WNW)</option>
-                        <option value="NWbW">Noroeste por Oeste (NWbW)</option>
-                        <option value="NW">Noroeste (NW)</option>
-                        <option value="NWbN">Noroeste por Norte (NWbN)</option>
-                        <option value="NNW">Nornoroeste (NNW)</option>
-                        <option value="NbW">Norte por Oeste (NbW)</option>
-                    </select>
+                    <label>Dirección Actual del Viento:</label>
+                    <div id="compass-selector-container">
+                        <img src="imagenes/compas.webp" alt="Compás para seleccionar el viento" class="compass-image">
+                        <div id="compass-arrow"></div>
+                    </div>
+                    <p id="current-wind-display"></p>
                 </div>
+
                 <div class="input-group">
                     <label for="future-prediction-time">Predecir para la Hora (UTC):</label>
                     <input type="time" id="future-prediction-time" value="13:00">

@@ -27,7 +27,6 @@
     const windPredictorModal = document.getElementById("wind-predictor-modal");
     const closeWindPredictorButton = document.getElementById("close-wind-predictor-button");
     const currentServerTimeInput = document.getElementById("current-server-time");
-    const currentWindDirectionSelect = document.getElementById("current-wind-direction");
     const futurePredictionTimeInput = document.getElementById("future-prediction-time");
     const calculateWindButton = document.getElementById("calculate-wind-button");
     const predictedWindText = document.getElementById("predicted-wind-text");
@@ -38,10 +37,14 @@
     const predictedInverseText = document.getElementById("predicted-inverse-text");
     const predictedInverseDegrees = document.getElementById("predicted-inverse-degrees");
     
+    const compassSelectorContainer = document.getElementById("compass-selector-container");
+    const compassArrow = document.getElementById("compass-arrow");
+    const currentWindDisplay = document.getElementById("current-wind-display");
+    let currentWindDirectionDegrees = 0;
+    
     const battleInfo = { clan: document.getElementById("battleClan"), countdown: document.getElementById("battleCountdown"), lastBattleDate: document.getElementById("lastBattleDate"), brLimit: document.getElementById("battle-br-limit"), points: document.getElementById("port-points"), window: document.getElementById("battle-window"), defenses: document.getElementById("port-defenses") };
     const tradeInfo = { sorters: document.getElementById("trade-sorters"), items: document.getElementById("tradeItems"), summaryTax: document.getElementById("trade-tax"), summaryVolume: document.getElementById("trade-volume") };
 
-    // --- ESTADO DE LA APLICACIÓN ---
     const state = {
         ports: [], nations: [], shops: [], itemTemplatesMap: new Map(), tileImages: [], nationIcons: {},
         itemTradeDatabase: new Map(),
@@ -53,7 +56,8 @@
         scale: 0.25, offsetX: 0, offsetY: 0,
         isDragging: false, dragStartX: 0, dragStartY: 0,
         mouseDownPos: { x: 0, y: 0 }, isClick: false, battleCountdownInterval: null,
-        currentPortItems: [], currentSort: { key: 'name', asc: true },
+        currentPortItems: [], 
+        currentSort: { key: 'name', asc: true },
         raidAlertPorts: []
     };
 
@@ -86,7 +90,6 @@
         { name: "Oeste por Sur", abbr: "WbS", degrees: 345 }
     ];
 
-    // --- LÓGICA DE CARGA DE RECURSOS ---
     async function loadAssets() {
         const loadImage = (src) => new Promise((resolve) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = () => { console.warn(`No se pudo cargar: ${src}`); resolve(null); }; img.src = src; });
         const fetchJsonWithFallback = async (basePath) => {
@@ -126,14 +129,12 @@
         } catch (error) { console.error("❌ Fallo en Promise.all:", error); ctx.font = "16px Arial"; ctx.fillStyle = "red"; ctx.fillText("Error al cargar datos.", 20, 40); }
     }
 
-    // --- LÓGICA DE DIBUJADO Y ANIMACIÓN ---
     let lineDashOffset = 0;
     function animationLoop() { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.save(); ctx.translate(state.offsetX, state.offsetY); ctx.scale(state.scale, state.scale); state.tileImages.forEach((img, index) => { if (img) { const x = (index % mapConfig.tilesPerRow) * mapConfig.tileSize, y = Math.floor(index / mapConfig.tilesPerRow) * mapConfig.tileSize; ctx.drawImage(img, x, y, mapConfig.tileSize, mapConfig.tileSize); } }); drawTradeRoute(); state.ports.forEach(port => drawPort(port)); drawRaidAlerts(); ctx.restore(); requestAnimationFrame(animationLoop); }
     function drawPort(port) { if (!port.coordinates) return; const [x, y] = port.coordinates; const icon = state.nationIcons[port.nationId]; if (icon) { ctx.drawImage(icon, x - 16, y - 16, 32, 32); } else { ctx.beginPath(); ctx.arc(x, y, 8, 0, 2 * Math.PI); ctx.fillStyle = port.countyCapital ? 'red' : 'yellow'; ctx.fill(); } if (state.scale > 0.3 && port.name) { ctx.font = `bold 14px Arial`; ctx.fillStyle = 'white'; ctx.strokeStyle = 'black'; ctx.lineWidth = 3; ctx.strokeText(port.name, x + 16, y + 5); ctx.fillText(port.name, x + 16, y + 5); } }
     function drawRaidAlerts() { if (state.raidAlertPorts.length === 0) return; const pulse = Math.abs(Math.sin(Date.now() * 0.002)) * 8; const radius = 25 + pulse; ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)'; ctx.lineWidth = 3 / state.scale; state.raidAlertPorts.forEach(port => { if (!port.coordinates) return; const [x, y] = port.coordinates; ctx.beginPath(); ctx.arc(x, y, radius, 0, 2 * Math.PI); ctx.stroke(); }); }
     function drawTradeRoute() { if (!state.selectedTradeRoute) return; const { buyPort, sellPort } = state.selectedTradeRoute; ctx.beginPath(); ctx.setLineDash([15 / state.scale, 10 / state.scale]); lineDashOffset -= 0.2; ctx.lineDashOffset = lineDashOffset; ctx.moveTo(buyPort.coordinates[0], buyPort.coordinates[1]); ctx.lineTo(sellPort.coordinates[0], sellPort.coordinates[1]); ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3 / state.scale; ctx.stroke(); ctx.setLineDash([]); }
 
-    // --- MANEJADORES DE EVENTOS ---
     const closeEverything = () => {
         battleMenu.classList.add('hidden');
         tradeMenu.classList.add('hidden');
@@ -177,7 +178,6 @@
         }
     }
 
-    // --- FUNCIONES DEL PANEL Y MENÚ ---
     function showPortPanel(port) { tooltip.style.display = "none"; portPanel.classList.remove('hidden'); portPanelTitle.textContent = port.name; battleInfo.clan.textContent = port.Capturer ?? 'Ninguno'; updateBattleTimers(port); battleInfo.brLimit.textContent = port.PortBattleBRLimit ?? 'N/A'; battleInfo.points.textContent = port.PortPoints ?? 'N/A'; const startTime = port.PortBattleStartTime, length = port.PortBattleTimeSlotLength; if (startTime !== undefined && length !== undefined) { const endTime = startTime + length; battleInfo.window.textContent = `${startTime}:00 - ${endTime}:00 UTC`; } else { battleInfo.window.textContent = 'N/A'; } if (port.PortElements && port.PortElements.length > 0) { battleInfo.defenses.innerHTML = port.PortElements.map(def => `<li>${def.TemplateName}</li>`).join(''); } else { battleInfo.defenses.innerHTML = '<li>Sin defensas</li>'; } const shop = state.shops.find(s => s.Id === port.Id); let totalVolume = 0; if (shop && shop.RegularItems) { state.currentPortItems = shop.RegularItems.map(item => { const details = state.itemTemplatesMap.get(item.TemplateId); totalVolume += item.Quantity; return { ...item, name: details ? details.Name.trim() : `ID:${item.TemplateId}` }; }); } else { state.currentPortItems = []; } tradeInfo.summaryTax.textContent = `${(port.PortTax * 100).toFixed(0)}%`; tradeInfo.summaryVolume.textContent = totalVolume.toLocaleString(); sortAndRenderTradeItems(); switchTab('battle'); }
     function hidePortPanel() { portPanel.classList.add('hidden'); if (state.battleCountdownInterval) { clearInterval(state.battleCountdownInterval); state.battleCountdownInterval = null; } }
     const TicksToDate = (ticks) => new Date((Number(BigInt(ticks) - BigInt(621355968000000000)) / 10000));
@@ -264,26 +264,54 @@
         });
     }
 
-    function populateTopProfitItems() { const topProfitItems = []; state.itemTradeDatabase.forEach((item, itemId) => { if (item.buyLocations.length > 0 && item.sellLocations.length > 0) { const minBuyPrice = Math.min(...item.buyLocations.map(loc => loc.price)); const maxSellPrice = Math.max(...item.sellLocations.map(loc => loc.price)); const profit = maxSellPrice - minBuyPrice; if (profit > 0) { topProfitItems.push({ name: item.name, profit: profit }); } } }); topProfitItems.sort((a, b) => b.profit - a.profit); const top10 = topProfitItems.slice(0, 10); const topProfitList = document.getElementById("top-profit-list"); topProfitList.innerHTML = top10.map(item => `<li><span class="top-item-name">${item.name}</span><span class="top-item-profit">+${item.profit.toLocaleString()}</span></li>`).join(''); topProfitList.querySelectorAll('li').forEach(li => { li.addEventListener('click', () => { const itemName = li.querySelector('.top-item-name').textContent; routeFinderInput.value = itemName; routeFinderInput.dispatchEvent(new Event('input')); }); }); }
+    function populateTopProfitItems() {
+        const topProfitItems = [];
+        state.itemTradeDatabase.forEach((item) => {
+            if (item.buyLocations.length > 0 && item.sellLocations.length > 0) {
+                const minBuyPrice = Math.min(...item.buyLocations.map(loc => loc.price));
+                const maxSellPrice = Math.max(...item.sellLocations.map(loc => loc.price));
+                const profit = maxSellPrice - minBuyPrice;
+                if (profit > 0) {
+                    topProfitItems.push({ name: item.name, profit: profit });
+                }
+            }
+        });
+        topProfitItems.sort((a, b) => b.profit - a.profit);
+        const top10 = topProfitItems.slice(0, 10);
+        const topProfitList = document.getElementById("top-profit-list");
+        topProfitList.innerHTML = top10.map(item => `<li><span class="top-item-name">${item.name}</span><span class="top-item-profit">+${item.profit.toLocaleString()}</span></li>`).join('');
+        topProfitList.querySelectorAll('li').forEach(li => {
+            li.addEventListener('click', () => {
+                const itemName = li.querySelector('.top-item-name').textContent;
+                routeFinderInput.value = itemName;
+                routeFinderInput.dispatchEvent(new Event('input'));
+            });
+        });
+    }
     
-    // CAMBIO: Lógica de batalla actualizada para mostrar contador de días
     function populateBattleIntelligence() {
         const now = new Date();
         const SPANISH_NATION_ID = 2;
         const dateOptions = { day: '2-digit', month: 'short' };
         
-        state.raidAlertPorts = state.ports.filter(p => {
-            if (!p.LastRaidStartTime || p.LastRaidStartTime <= 0) return false;
-            const raidDate = TicksToDate(p.LastRaidStartTime);
-            return raidDate.getTime() > (now.getTime() - (4 * 60 * 60 * 1000));
+        // CORREGIDO: Muestra solo el puerto con la batalla más reciente
+        let latestRaidPort = null;
+        state.ports.forEach(p => {
+            if (p.LastRaidStartTime && p.LastRaidStartTime > 0) {
+                if (!latestRaidPort || p.LastRaidStartTime > latestRaidPort.LastRaidStartTime) {
+                    latestRaidPort = p;
+                }
+            }
         });
 
-        if (state.raidAlertPorts.length > 0) {
-            raidAlertsContainer.innerHTML = state.raidAlertPorts.map(p => `<div class="alert" data-port-id="${p.Id}">ALERTA DE RAID: ${p.name} (clan ${p.Capturer || 'N/A'})</div>`).join('');
+        if (latestRaidPort) {
+            raidAlertsContainer.innerHTML = `<div class="alert" data-port-id="${latestRaidPort.Id}">ALERTA DE RAID: ${latestRaidPort.name} (clan ${latestRaidPort.Capturer || 'N/A'})</div>`;
             battleMenuToggle.classList.add('raid-active');
+            state.raidAlertPorts = [latestRaidPort];
         } else {
             raidAlertsContainer.innerHTML = '';
             battleMenuToggle.classList.remove('raid-active');
+            state.raidAlertPorts = [];
         }
 
         const allCooldownPorts = state.ports.filter(p => p.Capturer && p.LastPortBattle > 0).map(p => {
@@ -353,14 +381,15 @@
     }
     
     function calculateWindPrediction() {
-        const currentServerTime = currentServerTimeInput.value; const currentWindDirectionAbbr = currentWindDirectionSelect.value; const futurePredictionTime = futurePredictionTimeInput.value;
-        if (!currentServerTime || !currentWindDirectionAbbr || !futurePredictionTime) { return; }
+        const currentServerTime = currentServerTimeInput.value;
+        const futurePredictionTime = futurePredictionTimeInput.value;
+        if (!currentServerTime || !futurePredictionTime) { return; }
         
         const parseTime = (timeStr) => { const [hours, minutes] = timeStr.split(':').map(Number); return hours * 60 + minutes; };
         const currentTimeInMinutes = parseTime(currentServerTime);
         const futureTimeInMinutes = parseTime(futurePredictionTime);
         
-        const currentWind = windDirections.find(d => d.abbr === currentWindDirectionAbbr);
+        const currentWind = { degrees: currentWindDirectionDegrees };
         if (!currentWind) return;
 
         let timeDifference = futureTimeInMinutes - currentTimeInMinutes;
@@ -399,6 +428,17 @@
 
         predictedInverseText.textContent = `${closestInverseDirection.name} (${closestInverseDirection.abbr})`;
         predictedInverseDegrees.textContent = `(${inverseDegrees.toFixed(1)}°)`;
+    }
+
+    function updateCompassSelector(degrees) {
+        compassArrow.style.transform = `translate(-50%, -100%) rotate(${degrees}deg)`;
+        currentWindDirectionDegrees = degrees;
+        currentWindDisplay.textContent = `${degreesToCardinal(degrees)} (${degrees.toFixed(1)}°)`;
+    }
+
+    function degreesToCardinal(degrees) {
+        const cardinals = ["Norte (N)", "Nornoreste (NNE)", "Estenoreste (ENE)", "Este (E)", "Estesureste (ESE)", "Sursureste (SSE)", "Sur (S)", "Sursuroeste (SSW)", "Oestesuroeste (WSW)", "Oeste (W)", "Oestenoroeste (WNW)", "Nornoroeste (NNW)", "Norte (N)"];
+        return cardinals[Math.floor((degrees + 15) / 30)];
     }
 
     function initializeSideMenus() {
@@ -458,6 +498,25 @@
         tradeHubsList.addEventListener('click', (e) => { e.stopPropagation(); const target = e.target.closest('li'); if (target && target.dataset.portId) { const port = state.ports.find(p => p.Id === target.dataset.portId); if (port) panToPort(port); } });
 
         calculateWindButton.addEventListener('click', calculateWindPrediction);
+        
+        compassSelectorContainer.addEventListener('click', (event) => {
+            const rect = compassSelectorContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+        
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+        
+            const deltaX = mouseX - centerX;
+            const deltaY = mouseY - centerY;
+        
+            let angleRad = Math.atan2(deltaY, deltaX);
+            let angleDegrees = angleRad * (180 / Math.PI);
+        
+            angleDegrees = (angleDegrees + 90 + 360) % 360;
+        
+            updateCompassSelector(angleDegrees);
+        });
     }
 
     function initialize() {
@@ -486,6 +545,13 @@
                 modalOverlay.classList.remove('hidden');
                 windPredictorModal.classList.remove('hidden');
                 windPredictorToggle.classList.add('active');
+                
+                const now = new Date();
+                const currentUTCHours = now.getUTCHours().toString().padStart(2, '0');
+                const currentUTCMinutes = now.getUTCMinutes().toString().padStart(2, '0');
+                currentServerTimeInput.value = `${currentUTCHours}:${currentUTCMinutes}`;
+                
+                updateCompassSelector(0);
             }
         });
         
