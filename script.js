@@ -60,10 +60,30 @@
     const imagenesPorId = { 0: "imagenes/neu.svg", 1: "imagenes/pir.svg", 2: "imagenes/esp.svg", 3: "imagenes/fra.svg", 4: "imagenes/ing.svg", 5: "imagenes/ind.svg" };
 
     const windDirections = [
-        { name: "Norte", abbr: "N", degrees: 0 }, { name: "Nornoreste", abbr: "NNE", degrees: 22.5 }, { name: "Noreste", abbr: "NE", degrees: 45 }, { name: "Estenoreste", abbr: "ENE", degrees: 67.5 },
-        { name: "Este", abbr: "E", degrees: 90 }, { name: "Estesureste", abbr: "ESE", degrees: 112.5 }, { name: "Sureste", abbr: "SE", degrees: 135 }, { name: "Sursureste", abbr: "SSE", degrees: 157.5 },
-        { name: "Sur", abbr: "S", degrees: 180 }, { name: "Sursuroeste", abbr: "SSW", degrees: 202.5 }, { name: "Suroeste", abbr: "SW", degrees: 225 }, { name: "Oestesuroeste", abbr: "WSW", degrees: 247.5 },
-        { name: "Oeste", abbr: "W", degrees: 270 }, { name: "Oestenoroeste", abbr: "WNW", degrees: 292.5 }, { name: "Noroeste", abbr: "NW", degrees: 315 }, { name: "Nornoroeste", abbr: "NNW", degrees: 337.5 }
+        { name: "Norte", abbr: "N", degrees: 0 },
+        { name: "Norte por Este", abbr: "NbE", degrees: 15 },
+        { name: "Nornoreste", abbr: "NNE", degrees: 30 },
+        { name: "Noreste por Norte", abbr: "NEbN", degrees: 45 },
+        { name: "Noreste", abbr: "NE", degrees: 60 },
+        { name: "Noreste por Este", abbr: "NEbE", degrees: 75 },
+        { name: "Estenoreste", abbr: "ENE", degrees: 90 },
+        { name: "Este por Norte", abbr: "EbN", degrees: 105 },
+        { name: "Este", abbr: "E", degrees: 120 },
+        { name: "Este por Sur", abbr: "EbS", degrees: 135 },
+        { name: "Estesureste", abbr: "ESE", degrees: 150 },
+        { name: "Sureste por Este", abbr: "SEbE", degrees: 165 },
+        { name: "Sureste", abbr: "SE", degrees: 180 },
+        { name: "Sureste por Sur", abbr: "SEbS", degrees: 195 },
+        { name: "Sursureste", abbr: "SSE", degrees: 210 },
+        { name: "Sur por Este", abbr: "SbE", degrees: 225 },
+        { name: "Sur", abbr: "S", degrees: 240 },
+        { name: "Sur por Oeste", abbr: "SbW", degrees: 255 },
+        { name: "Sursuroeste", abbr: "SSW", degrees: 270 },
+        { name: "Suroeste por Sur", abbr: "SWbS", degrees: 285 },
+        { name: "Suroeste", abbr: "SW", degrees: 300 },
+        { name: "Suroeste por Oeste", abbr: "SWbW", degrees: 315 },
+        { name: "Oestesuroeste", abbr: "WSW", degrees: 330 },
+        { name: "Oeste por Sur", abbr: "WbS", degrees: 345 }
     ];
 
     // --- LÓGICA DE CARGA DE RECURSOS ---
@@ -128,7 +148,6 @@
         craftingMenuToggle.classList.remove('active');
         statsToggle.classList.remove('active');
         windPredictorToggle.classList.remove('active');
-        state.selectedTradeRoute = null;
     };
     function handleResize() { canvas.width = mapContainer.clientWidth; canvas.height = mapContainer.clientHeight; state.offsetX = (canvas.width - mapConfig.tilesPerRow * mapConfig.tileSize * state.scale) / 2; state.offsetY = (canvas.height - mapConfig.tilesPerCol * mapConfig.tileSize * state.scale) / 2; }
     function handleWheel(e) { e.preventDefault(); hidePortPanel(); state.selectedTradeRoute = null; const zoomFactor = 1.1; const mouseX = e.offsetX, mouseY = e.offsetY; const prevScale = state.scale; state.scale = e.deltaY < 0 ? state.scale * zoomFactor : state.scale / zoomFactor; state.offsetX = mouseX - (mouseX - state.offsetX) * (state.scale / prevScale); state.offsetY = mouseY - (mouseY - state.offsetY) * (state.scale / prevScale); }
@@ -154,6 +173,7 @@
         } else {
             hidePortPanel();
             closeEverything();
+            state.selectedTradeRoute = null;
         }
     }
 
@@ -175,6 +195,7 @@
     function panToPort(port) {
         if (!port.coordinates) return;
         closeEverything();
+        state.selectedTradeRoute = null;
         const targetScale = 0.5;
         state.scale = targetScale;
         state.offsetX = (canvas.width / 2) - (port.coordinates[0] * targetScale);
@@ -182,8 +203,44 @@
         showPortPanel(port);
     }
 
-    function panAndZoomToRoute(route) { if (!route.buyPort.coordinates || !route.sellPort.coordinates) { return; } const { buyPort, sellPort } = route; const [x1, y1] = buyPort.coordinates; const [x2, y2] = sellPort.coordinates; const midX = (x1 + x2) / 2; const midY = (y1 + y2) / 2; const dist = Math.hypot(x2 - x1, y2 - y1) * 1.2; const scaleX = canvas.width / dist; const scaleY = canvas.height / dist; state.scale = Math.min(scaleX, scaleY, 1.0); state.offsetX = (canvas.width / 2) - (midX * state.scale); state.offsetY = (canvas.height / 2) - (midY * state.scale); state.selectedTradeRoute = route; closeEverything();}
-    function showMaterialLocations(recipeName, materials) { materialPanelTitle.textContent = `Materiales para: ${recipeName}`; let html = ''; for (const req of materials) { const materialDetails = state.itemTemplatesMap.get(req.Template); const materialName = materialDetails ? materialDetails.Name : `ID: ${req.Template}`; const tradeData = state.itemTradeDatabase.get(req.Template); html += `<div class="material-item">`; html += `<h4>${req.Amount} x ${materialName}</h4>`; if (tradeData && tradeData.buyLocations.length > 0) { const cheapestPorts = tradeData.buyLocations.sort((a, b) => a.price - b.price).slice(0, 5); html += `<ul>`; cheapestPorts.forEach(port => { html += `<li>${port.portName} - <span class="price-buy">${port.price.toLocaleString()}</span></li>`; }); html += `</ul>`; } else { html += `<p>No se encontraron puertos de venta para este material.</p>`; } html += `</div>`; } materialListContainer.innerHTML = html; modalOverlay.classList.remove('hidden'); materialPanel.classList.remove('hidden'); }
+    function panAndZoomToRoute(route) {
+        if (!route.buyPort.coordinates || !route.sellPort.coordinates) { return; }
+        closeEverything();
+        const { buyPort, sellPort } = route;
+        const [x1, y1] = buyPort.coordinates;
+        const [x2, y2] = sellPort.coordinates;
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2;
+        const dist = Math.hypot(x2 - x1, y2 - y1) * 1.2;
+        const scaleX = canvas.width / dist;
+        const scaleY = canvas.height / dist;
+        state.scale = Math.min(scaleX, scaleY, 1.0);
+        state.offsetX = (canvas.width / 2) - (midX * state.scale);
+        state.offsetY = (canvas.height / 2) - (midY * state.scale);
+        state.selectedTradeRoute = route;
+    }
+    function showMaterialLocations(recipeName, materials) {
+        materialPanelTitle.textContent = `Materiales para: ${recipeName}`;
+        let html = '';
+        for (const req of materials) {
+            const materialDetails = state.itemTemplatesMap.get(req.Template);
+            const materialName = materialDetails ? materialDetails.Name : `ID: ${req.Template}`;
+            const tradeData = state.itemTradeDatabase.get(req.Template);
+            html += `<div class="material-item">`;
+            html += `<h4>${req.Amount} x ${materialName}</h4>`;
+            if (tradeData && tradeData.buyLocations.length > 0) {
+                const cheapestPorts = tradeData.buyLocations.sort((a, b) => a.price - b.price).slice(0, 5);
+                html += `<ul>`;
+                cheapestPorts.forEach(port => { html += `<li>${port.portName} - <span class="price-buy">${port.price.toLocaleString()}</span></li>`; });
+                html += `</ul>`;
+            } else {
+                html += `<p>No se encontraron puertos de venta para este material.</p>`;
+            }
+            html += `</div>`;
+        }
+        materialListContainer.innerHTML = html;
+        materialPanel.classList.remove('hidden');
+    }
     
     function buildItemTradeDatabase() { state.shops.forEach(shop => { const port = state.ports.find(p => p.Id === shop.Id); if (!port || !port.coordinates) return; (shop.RegularItems || []).forEach(item => { const itemDetails = state.itemTemplatesMap.get(item.TemplateId); if (itemDetails) { const entry = state.itemTradeDatabase.get(item.TemplateId) || { name: itemDetails.Name.trim(), buyLocations: [], sellLocations: [] }; if (item.BuyPrice > 0 && item.Quantity > 0) { entry.buyLocations.push({ portId: port.Id, portName: port.name, price: item.BuyPrice, coordinates: port.coordinates }); } if (item.SellPrice > 0) { entry.sellLocations.push({ portId: port.Id, portName: port.name, price: item.SellPrice, coordinates: port.coordinates }); } state.itemTradeDatabase.set(item.TemplateId, entry); } }); }); }
     function buildItemLocationDatabase() {
@@ -209,13 +266,18 @@
 
     function populateTopProfitItems() { const topProfitItems = []; state.itemTradeDatabase.forEach((item, itemId) => { if (item.buyLocations.length > 0 && item.sellLocations.length > 0) { const minBuyPrice = Math.min(...item.buyLocations.map(loc => loc.price)); const maxSellPrice = Math.max(...item.sellLocations.map(loc => loc.price)); const profit = maxSellPrice - minBuyPrice; if (profit > 0) { topProfitItems.push({ name: item.name, profit: profit }); } } }); topProfitItems.sort((a, b) => b.profit - a.profit); const top10 = topProfitItems.slice(0, 10); const topProfitList = document.getElementById("top-profit-list"); topProfitList.innerHTML = top10.map(item => `<li><span class="top-item-name">${item.name}</span><span class="top-item-profit">+${item.profit.toLocaleString()}</span></li>`).join(''); topProfitList.querySelectorAll('li').forEach(li => { li.addEventListener('click', () => { const itemName = li.querySelector('.top-item-name').textContent; routeFinderInput.value = itemName; routeFinderInput.dispatchEvent(new Event('input')); }); }); }
     
+    // CAMBIO: Lógica de batalla actualizada para mostrar contador de días
     function populateBattleIntelligence() {
-        const now = new Date(); const SPANISH_NATION_ID = 2; const dateOptions = { day: '2-digit', month: 'short' };
+        const now = new Date();
+        const SPANISH_NATION_ID = 2;
+        const dateOptions = { day: '2-digit', month: 'short' };
+        
         state.raidAlertPorts = state.ports.filter(p => {
             if (!p.LastRaidStartTime || p.LastRaidStartTime <= 0) return false;
             const raidDate = TicksToDate(p.LastRaidStartTime);
             return raidDate.getTime() > (now.getTime() - (4 * 60 * 60 * 1000));
         });
+
         if (state.raidAlertPorts.length > 0) {
             raidAlertsContainer.innerHTML = state.raidAlertPorts.map(p => `<div class="alert" data-port-id="${p.Id}">ALERTA DE RAID: ${p.name} (clan ${p.Capturer || 'N/A'})</div>`).join('');
             battleMenuToggle.classList.add('raid-active');
@@ -223,12 +285,48 @@
             raidAlertsContainer.innerHTML = '';
             battleMenuToggle.classList.remove('raid-active');
         }
-        const allCooldownPorts = state.ports.filter(p => p.Capturer && p.LastPortBattle > 0).map(p => { const lastAttack = TicksToDate(p.LastPortBattle); const cooldownEnd = new Date(lastAttack.getTime() + (14 * 24 * 60 * 60 * 1000)); return { port: p, cooldownEnd }; }).sort((a, b) => a.cooldownEnd - b.cooldownEnd);
+
+        const allCooldownPorts = state.ports.filter(p => p.Capturer && p.LastPortBattle > 0).map(p => {
+            const lastAttack = TicksToDate(p.LastPortBattle);
+            const cooldownEnd = new Date(lastAttack.getTime() + (14 * 24 * 60 * 60 * 1000));
+            const daysRemaining = Math.ceil((cooldownEnd - now) / (1000 * 60 * 60 * 24));
+            return { port: p, cooldownEnd, daysRemaining };
+        }).sort((a, b) => a.cooldownEnd - b.cooldownEnd);
+
         const spanishDefenses = allCooldownPorts.filter(item => item.port.nationId === SPANISH_NATION_ID && item.cooldownEnd > now);
-        if (spanishDefenses.length > 0) { spanishDefensesList.innerHTML = spanishDefenses.map(item => `<li data-port-id="${item.port.Id}"><div><span class="port-name">${item.port.name}</span><div class="port-info">Clan: ${item.port.Capturer}</div></div><span class="port-date defense">Activa hasta: ${item.cooldownEnd.toLocaleDateString('es-ES', dateOptions)}</span></li>`).join(''); } else { spanishDefensesList.innerHTML = `<li class="empty-list">No hay defensas españolas activas.</li>`; }
+        if (spanishDefenses.length > 0) {
+            spanishDefensesList.innerHTML = spanishDefenses.map(item =>
+                `<li data-port-id="${item.port.Id}">
+                    <div>
+                        <span class="port-name">${item.port.name}</span>
+                        <div class="port-info">Clan: ${item.port.Capturer}</div>
+                    </div>
+                    <span class="port-date defense">Activa hasta: ${item.cooldownEnd.toLocaleDateString('es-ES', dateOptions)} (${item.daysRemaining}d)</span>
+                </li>`
+            ).join('');
+        } else {
+            spanishDefensesList.innerHTML = `<li class="empty-list">No hay defensas españolas activas.</li>`;
+        }
+        
         const threeDaysFromNow = now.getTime() + (3 * 24 * 60 * 60 * 1000);
-        const attackTargets = allCooldownPorts.filter(item => item.port.nationId !== SPANISH_NATION_ID && item.cooldownEnd > now && item.cooldownEnd.getTime() < threeDaysFromNow);
-        if (attackTargets.length > 0) { attackTargetsList.innerHTML = attackTargets.map(item => `<li data-port-id="${item.port.Id}"><div><span class="port-name">${item.port.name}</span><div class="port-info">Nación: ${item.port.nationName}</div></div><span class="port-date">Vulnerable: ${item.cooldownEnd.toLocaleDateString('es-ES', dateOptions)}</span></li>`).join(''); } else { attackTargetsList.innerHTML = `<li class="empty-list">No hay objetivos próximos.</li>`; }
+        const attackTargets = allCooldownPorts.filter(item => 
+            item.port.nationId !== SPANISH_NATION_ID && 
+            item.cooldownEnd > now && 
+            item.cooldownEnd.getTime() < threeDaysFromNow
+        );
+        if (attackTargets.length > 0) {
+            attackTargetsList.innerHTML = attackTargets.map(item =>
+                `<li data-port-id="${item.port.Id}">
+                    <div>
+                        <span class="port-name">${item.port.name}</span>
+                        <div class="port-info">Nación: ${item.port.nationName}</div>
+                    </div>
+                    <span class="port-date">Vulnerable: ${item.cooldownEnd.toLocaleDateString('es-ES', dateOptions)} (${item.daysRemaining}d)</span>
+                </li>`
+            ).join('');
+        } else {
+            attackTargetsList.innerHTML = `<li class="empty-list">No hay objetivos próximos.</li>`;
+        }
     }
     
     function populateStatsMenu() { const nationCounts = state.ports.reduce((acc, port) => { acc[port.nationId] = (acc[port.nationId] || 0) + 1; return acc; }, {}); const sortedNations = Object.entries(nationCounts).map(([nationId, count]) => { const nation = state.nations.find(n => n.Id == nationId); return { nationId, name: nation ? nation.Name : 'Neutral', icon: imagenesPorId[nationId], count }; }).sort((a, b) => b.count - a.count); nationDominanceList.innerHTML = sortedNations.map(n => `<li><img src="${n.icon}" class="nation-icon" alt="${n.name}">${n.name}<span class="stat-value">${n.count}</span></li>`).join(''); const portVolumes = state.shops.map(shop => { const port = state.ports.find(p => p.Id === shop.Id); if (!port) return null; const totalVolume = (shop.RegularItems || []).reduce((sum, item) => sum + item.Quantity, 0); return { port, volume: totalVolume }; }).filter(p => p).sort((a, b) => b.volume - a.volume).slice(0, 10); tradeHubsList.innerHTML = portVolumes.map((item, index) => `<li data-port-id="${item.port.Id}"><span class="rank-badge">${index + 1}.</span>${item.port.name}<span class="stat-value">${item.volume.toLocaleString()}</span></li>`).join(''); const clanPoints = state.ports.reduce((acc, port) => { if (port.Capturer) { acc[port.Capturer] = (acc[port.Capturer] || 0) + (port.PortPoints || 0); } return acc; }, {}); const sortedClans = Object.entries(clanPoints).sort((a, b) => b[1] - a[1]).slice(0, 10); clanPowerList.innerHTML = sortedClans.map(([name, points], index) => `<li><span class="rank-badge">${index + 1}.</span>${name}<span class="stat-value">${points} Pts</span></li>`).join(''); }
@@ -268,7 +366,7 @@
         let timeDifference = futureTimeInMinutes - currentTimeInMinutes;
         if (timeDifference < 0) { timeDifference += 24 * 60; }
 
-        const degreesPerMinute = 360 / 48;
+        const degreesPerMinute = 360 / 49;
         const degreeShift = timeDifference * degreesPerMinute;
         
         let predictedDegrees = currentWind.degrees - degreeShift;
@@ -316,7 +414,12 @@
             });
             if (matchingItems.length === 0) { productFinderResults.innerHTML = '<div>No se encontraron productos.</div>'; return; }
             const item = matchingItems[0];
-            productFinderResults.innerHTML = item.locations.map(loc => `<div class="product-location" data-port-id="${loc.portId}"><div class="location-header"><span>${loc.portName}</span><span>Cant: ${loc.quantity.toLocaleString()}</span></div><div class="location-details">Compra: <span class="price-buy">${loc.buyPrice.toLocaleString()}</span> / Venta: <span class="price-sell">${loc.sellPrice.toLocaleString()}</span></div></div>`).join('');
+            const availableLocations = item.locations.filter(loc => loc.quantity > 0);
+            if (availableLocations.length === 0) {
+                productFinderResults.innerHTML = '<div>Producto sin stock en ningún puerto.</div>';
+                return;
+            }
+            productFinderResults.innerHTML = availableLocations.map(loc => `<div class="product-location" data-port-id="${loc.portId}"><div class="location-header"><span>${loc.portName}</span><span>Cant: ${loc.quantity.toLocaleString()}</span></div><div class="location-details">Compra: <span class="price-buy">${loc.buyPrice.toLocaleString()}</span> / Venta: <span class="price-sell">${loc.sellPrice.toLocaleString()}</span></div></div>`).join('');
         });
         productFinderResults.addEventListener('click', (e) => { e.stopPropagation(); const target = e.target.closest('.product-location'); if (target && target.dataset.portId) { const port = state.ports.find(p => p.Id === target.dataset.portId); if (port) panToPort(port); } });
         
@@ -400,7 +503,6 @@
         tabsContainer.addEventListener('click', (e) => { if (e.target.matches('.tab-button')) { switchTab(e.target.dataset.tab); } });
         closeMaterialPanelButton.addEventListener('click', () => { 
             materialPanel.classList.add('hidden');
-            modalOverlay.classList.add('hidden');
         });
         
         loadAssets().then(() => {

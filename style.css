@@ -202,36 +202,38 @@ html, body {
     transform-origin: center;
     position: absolute;
 }
+
+/* CAMBIO: Flecha invertida */
 #wind-arrow {
     width: 0; 
     height: 0; 
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-bottom: 35px solid #e74c3c;
+    /* La "cola" ahora es un rectángulo */
+    border-top: 25px solid #e74c3c;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
     position: absolute;
-    top: 0;
+    bottom: 0; /* Empieza desde abajo */
     left: 50%;
     transform: translateX(-50%);
 }
-#wind-arrow::before {
+#wind-arrow::before { /* Cuerpo */
     content: '';
     position: absolute;
     width: 6px;
     height: 110px;
     background-color: #e74c3c;
     left: -3px;
-    top: 35px;
+    bottom: 25px; /* Nace de la cola */
 }
-#wind-arrow::after {
+#wind-arrow::after { /* Punta de la flecha */
     content: '';
     position: absolute;
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-top: 25px solid #e74c3c;
-    left: -12px;
-    top: 145px;
+    width: 30px;
+    height: 10px;
+    background-color: #e74c3c;
+    left: -15px;
+    bottom: 135px; /* En la parte superior */
+    border-radius: 2px;
 }
 
 #route-finder-input, #recipe-finder-input, #product-finder-input { width: 100%; padding: 10px; background: #333; border: 1px solid #555; color: #eee; border-radius: 4px; box-sizing: border-box; margin-bottom: 10px;}
